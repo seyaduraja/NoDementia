@@ -4,25 +4,25 @@ import face_recognition
 import cv2
 import numpy as np
 import os
+import pyttsx3
 import threading
 from PIL import Image
 from gtts import gTTS
-import pygame
-import tempfile  # For handling temporary files
+from playsound import playsound  # Using playsound for audio playback
 
 # Folder containing face images
 FACE_DIR = "faces"
 
-# Dictionary to store introductions in English and Tamil
+# Face descriptions in English and Tamil
 face_intros = {
     "seyadu": {
         "en": "This is Seyadu. He is a software engineer and loves playing chess.",
-        "ta": "இவர் செயது. இவர் ஒரு மென்பொருள் பொறியாளர் மற்றும் செஸ் விளையாடுவதற்கு மிகவும் விருப்பம்."
+        "ta": "இது சேயது. இவர் ஒரு மென்பொருள் பொறியாளர், செஸ் விளையாட்டை விரும்புகிறார்."
     },
     "virat": {
         "en": "This is Virat. He is the king of cricket.",
-        "ta": "இவர் விராட். இவர் கிரிக்கெட் உலகத்தின் அரசன்."
-    },
+        "ta": "இது விராட். அவர் கிரிக்கெட் உலகின் மன்னன்."
+    }
 }
 
 # Track last spoken times for each face
@@ -45,43 +45,43 @@ def load_faces():
 # Load faces at startup
 known_face_encodings, known_face_names = load_faces()
 
-# Function to speak introduction with a 30-second interval using gTTS
-def speak_intro(name, language):
+# Function to speak introduction with a 30-second interval
+def speak_intro(name, language, use_gtts):
     global last_spoken_time
     current_time = time.time()
 
-    # Speak only if 30 seconds have passed since the last speech for this face
     if name not in last_spoken_time or (current_time - last_spoken_time[name] > 30):
-        last_spoken_time[name] = current_time  # Update last spoken time
+        last_spoken_time[name] = current_time
 
-        def speak():
-            text = face_intros.get(name, {}).get(language, f"This is {name}. I don't have more information.")
+        text = face_intros.get(name, {}).get(language, f"This is {name}. No additional information available.")
 
-            # Create a temporary file to avoid deletion issues
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+        if use_gtts:
+            def speak_gtts():
+                audio_file = "intro.mp3"
                 tts = gTTS(text=text, lang="ta" if language == "ta" else "en")
-                tts.save(temp_audio.name)
-                audio_file = temp_audio.name  # Store filename
+                tts.save(audio_file)
+                playsound(audio_file)  # Blocking playback to ensure deletion after completion
+                os.remove(audio_file)  # Delete file after playback
 
-            # Play audio using pygame
-            pygame.mixer.init()
-            pygame.mixer.music.load(audio_file)
-            pygame.mixer.music.play()
+            threading.Thread(target=speak_gtts, daemon=True).start()
+        else:
+            def speak_pyttsx3():
+                engine = pyttsx3.init()
+                engine.setProperty("rate", 150)
 
-            while pygame.mixer.music.get_busy():
-                time.sleep(0.1)  # Allow pygame to finish playing
+                voices = engine.getProperty("voices")
+                for voice in voices:
+                    if language == "ta" and ("tamil" in voice.name.lower() or "tam" in voice.id.lower()):
+                        engine.setProperty("voice", voice.id)
+                        break
 
-            pygame.mixer.music.stop()
-            pygame.mixer.music.unload()  # Ensure the file is unlocked
-            pygame.mixer.quit()
+                engine.say(text)
+                engine.runAndWait()
 
-            time.sleep(0.5)  # Small delay to ensure file is released
-            os.remove(audio_file)  # Now delete safely
-
-        threading.Thread(target=speak, daemon=True).start()
+            threading.Thread(target=speak_pyttsx3, daemon=True).start()
 
 # Function to recognize faces
-def recognize_faces(language):
+def recognize_faces(language, use_gtts):
     video_capture = cv2.VideoCapture(0)
     process_this_frame = True
 
@@ -93,7 +93,6 @@ def recognize_faces(language):
             st.error("Failed to access webcam.")
             break
 
-        # Resize frame for faster processing
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
         rgb_small_frame = small_frame[:, :, ::-1]
 
@@ -111,8 +110,7 @@ def recognize_faces(language):
                 if matches[best_match_index]:
                     name = known_face_names[best_match_index]
 
-                    # Speak only if the face is detected for the first time or after 30 sec
-                    speak_intro(name, language)
+                    speak_intro(name, language, use_gtts)
 
                 face_names.append(name)
 
@@ -137,15 +135,17 @@ def recognize_faces(language):
 
 # Streamlit UI
 st.sidebar.title("NoDementia")
-
-# Language selection
-language = st.sidebar.radio("Select Language:", ["English", "தமிழ்"])
-lang_code = "en" if language == "English" else "ta"
-
 st.sidebar.write("### Faces Folder")
 face_files = os.listdir(FACE_DIR)
 for file in face_files:
     st.sidebar.write(f"- {file}")
+
+st.sidebar.write("### Select Language")
+language = st.sidebar.selectbox("Choose a language", ["English", "Tamil"], index=0)
+language_code = "en" if language == "English" else "ta"
+
+st.sidebar.write("### Select Speech Engine")
+use_gtts = st.sidebar.checkbox("Use Google Text-to-Speech (Online)", value=False)
 
 st.sidebar.write("### Add New Face Image")
 uploaded_file = st.sidebar.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
@@ -153,8 +153,8 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     image.save(os.path.join(FACE_DIR, uploaded_file.name))
     st.sidebar.success(f"Saved {uploaded_file.name}")
-    known_face_encodings, known_face_names = load_faces()  # Reload faces after adding a new one
+    known_face_encodings, known_face_names = load_faces()
 
 st.title("NoDementia")
 if st.button("Recognize"):
-    recognize_faces(lang_code)
+    recognize_faces(language_code, use_gtts)
