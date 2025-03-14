@@ -1,29 +1,38 @@
+import os
+import json
 import time
+import threading
+import tempfile
+import numpy as np
+import cv2
+import pygame
 import streamlit as st
 import face_recognition
-import cv2
-import numpy as np
-import os
-import threading
-from PIL import Image
 from gtts import gTTS
-import pygame
-import tempfile  # For handling temporary files
+from PIL import Image
 
-# Folder containing face images
+# Constants
 FACE_DIR = "faces"
+DESC_FILE = "descriptions.json"  # JSON file to store descriptions
 
-# Dictionary to store introductions in English and Tamil
-face_intros = {
-    "seyadu": {
-        "en": "This is Seyadu. He is a software engineer and loves playing chess.",
-        "ta": "இவர் செயது. இவர் ஒரு மென்பொருள் பொறியாளர் மற்றும் செஸ் விளையாடுவதற்கு மிகவும் விருப்பம்."
-    },
-    "virat": {
-        "en": "This is Virat. He is the king of cricket.",
-        "ta": "இவர் விராட். இவர் கிரிக்கெட் உலகத்தின் அரசன்."
-    },
-}
+# Load descriptions from JSON
+def load_descriptions():
+    if not os.path.exists(DESC_FILE):
+        return {}
+    try:
+        with open(DESC_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        return {}
+
+# Save descriptions to JSON
+def save_descriptions(descriptions):
+    with open(DESC_FILE, "w", encoding="utf-8") as file:
+        json.dump(descriptions, file, indent=4, ensure_ascii=False)
+
+# Initialize session state for descriptions
+if "face_intros" not in st.session_state:
+    st.session_state["face_intros"] = load_descriptions()
 
 # Track last spoken times for each face
 last_spoken_time = {}
@@ -45,7 +54,7 @@ def load_faces():
 # Load faces at startup
 known_face_encodings, known_face_names = load_faces()
 
-# Function to speak introduction with a 30-second interval using gTTS
+# Function to speak introduction
 def speak_intro(name, language):
     global last_spoken_time
     current_time = time.time()
@@ -54,31 +63,32 @@ def speak_intro(name, language):
     if name not in last_spoken_time or (current_time - last_spoken_time[name] > 30):
         last_spoken_time[name] = current_time  # Update last spoken time
 
-        def speak():
-            text = face_intros.get(name, {}).get(language, f"This is {name}. I don't have more information.")
+        # Fetch face descriptions before starting the thread
+        face_intros = st.session_state.get("face_intros", {})
 
-            # Create a temporary file to avoid deletion issues
+        def speak(face_intros, name, language):
+            text = face_intros.get(name, {}).get(language, f"This is {name}. No description available.")
+
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
                 tts = gTTS(text=text, lang="ta" if language == "ta" else "en")
                 tts.save(temp_audio.name)
                 audio_file = temp_audio.name  # Store filename
 
-            # Play audio using pygame
             pygame.mixer.init()
             pygame.mixer.music.load(audio_file)
             pygame.mixer.music.play()
 
             while pygame.mixer.music.get_busy():
-                time.sleep(0.1)  # Allow pygame to finish playing
+                time.sleep(0.1)
 
             pygame.mixer.music.stop()
-            pygame.mixer.music.unload()  # Ensure the file is unlocked
+            pygame.mixer.music.unload()
             pygame.mixer.quit()
 
             time.sleep(0.5)  # Small delay to ensure file is released
             os.remove(audio_file)  # Now delete safely
 
-        threading.Thread(target=speak, daemon=True).start()
+        threading.Thread(target=speak, args=(face_intros, name, language), daemon=True).start()
 
 # Function to recognize faces
 def recognize_faces(language):
@@ -154,6 +164,25 @@ if uploaded_file is not None:
     image.save(os.path.join(FACE_DIR, uploaded_file.name))
     st.sidebar.success(f"Saved {uploaded_file.name}")
     known_face_encodings, known_face_names = load_faces()  # Reload faces after adding a new one
+
+# Form to add descriptions
+st.sidebar.write("### Add Face Description")
+name_input = st.sidebar.text_input("Enter face name (must match image filename, no extension)").strip().lower()
+en_desc = st.sidebar.text_area("Enter English description")
+ta_desc = st.sidebar.text_area("தமிழில் விளக்கம் (Tamil Description)")
+
+if st.sidebar.button("Save Description"):
+    if name_input:
+        # Reload latest descriptions
+        st.session_state["face_intros"] = load_descriptions()
+
+        # Update or add new entry
+        st.session_state["face_intros"][name_input] = {"en": en_desc.strip(), "ta": ta_desc.strip()}
+        save_descriptions(st.session_state["face_intros"])  # Save updated JSON
+
+        st.sidebar.success(f"Saved description for {name_input}")
+    else:
+        st.sidebar.error("Please enter a valid name.")
 
 st.title("NoDementia")
 if st.button("Recognize"):
