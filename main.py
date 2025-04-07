@@ -9,7 +9,7 @@ import pygame
 import streamlit as st
 import face_recognition
 from gtts import gTTS
-from PIL import Image
+
 
 # Constants
 FACE_DIR = "faces"
@@ -116,7 +116,19 @@ def recognize_faces(language):
                     if name not in last_print_time or (current_time - last_print_time[name] > 30):
                         last_print_time[name] = current_time
                         time_str = time.strftime("%H:%M:%S", time.localtime(current_time))  # FIXED LOCAL TIME
-                        st.write(f"{name.capitalize()} detected at {time_str}")
+                        st.markdown(f"""
+                                <div style='
+                                    background-color: #e0f7fa;
+                                    padding: 16px;
+                                    border-radius: 12px;
+                                    box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+                                    margin: 10px 0;
+                                    font-size: 18px;
+                                    color: #00796b;
+                                '>
+                                    <strong>📍 {name.capitalize()}</strong> detected at <em>{time_str}</em>
+                                </div>
+                                """, unsafe_allow_html=True)
                 face_names.append(name)
         process_this_frame = not process_this_frame
 
@@ -135,32 +147,5 @@ def recognize_faces(language):
     video_capture.release()
     cv2.destroyAllWindows()
 
-# Streamlit UI
-language = st.sidebar.radio("Select Language:", ["English", "தமிழ்"])
-lang_code = "en" if language == "English" else "ta"
-st.sidebar.write("### Faces Folder")
-face_files = os.listdir(FACE_DIR)
-for file in face_files:
-    st.sidebar.write(f"- {file}")
-st.sidebar.write("### Add New Face Image")
-uploaded_file = st.sidebar.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    image.save(os.path.join(FACE_DIR, uploaded_file.name))
-    st.sidebar.success(f"Saved {uploaded_file.name}")
-    known_face_encodings, known_face_names = load_faces()
-st.sidebar.write("### Add Face Description")
-name_input = st.sidebar.text_input("Enter face name (must match image filename, no extension)").strip().lower()
-en_desc = st.sidebar.text_area("Enter English description")
-ta_desc = st.sidebar.text_area("தமிழில் விளக்கம் (Tamil Description)")
-if st.sidebar.button("Save Description"):
-    if name_input:
-        st.session_state["face_intros"] = load_descriptions()
-        st.session_state["face_intros"][name_input] = {"en": en_desc.strip(), "ta": ta_desc.strip()}
-        save_descriptions(st.session_state["face_intros"])
-        st.sidebar.success(f"Saved description for {name_input}")
-    else:
-        st.sidebar.error("Please enter a valid name.")
-st.title("NoDementia")
-if st.button("Recognize"):
-    recognize_faces(lang_code)
+
+
