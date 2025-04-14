@@ -7,20 +7,44 @@
         "en": "This is Virat. He is the king of cricket.",
         "ta": "இவர் விராட். இவர் கிரிக்கெட் உலகத்தின் அரசன்."
     },
-    "rohit": {
-        "en": "rohit is a great captain and opener",
-        "ta": "ரோஹித் ஒரு சிறந்த கேப்டன் மற்றும் தொடக்க வீரர்."
-    },
     "radhika": {
-        "en": "radhika is a data science student",
-        "ta": "ராதிகா ஒரு தரவு அறிவியல் மாணவி"
+        "en": "her  name is radhika. she is your grandchild.  she is 23 years old. the gender is female. data science student in srm college",
+        "ta": "அவள் பெயர் ராதிகா. அவள் உங்கள் பேத்தி. அவளுக்கு 23 வயது. பாலினம் பெண். எஸ்.ஆர்.எம் கல்லூரியில் டேட்டா சயின்ஸ் மாணவி."
     },
-    "salt": {
-        "en": "rcb opener",
-        "ta": "ஆர்சிபி தொடக்க வீரர்"
+    "dharani": {
+        "en": "her name  is Dharani. Radhika's sister. She is 18 years old",
+        "ta": "அவள் பெயர் தரணி. ராதிகாவின் சகோதரி. அவளுக்கு 18 வயது."
     },
-    "jadeja": {
-        "en": "jadeja is the best all-rounder of india",
-        "ta": "இந்தியாவின் சிறந்த ஆல்ரவுண்டர் ஜடேஜா."
+    "jhon": {
+        "en": "your are the  dementia patient. your name is  John .Age: 68.Gender: male. your phone number: 8938465903 .Emergency number of son: 9633465661.Diagnosis: Early-stage Dementia. Address: no:39, 3rd street brindhavana nagar, avadi, chennai-65.",
+        "ta": "நீங்க டிமென்ஷியா நோயாளி. உங்க பெயர் ஜான். வயது: 68. பாலினம்: ஆண். உங்க போன் நம்பர்: 8938465903. மகனின் அவசர உதவி எண்: 9633465661. நோய் கண்டறிதல்: ஆரம்ப நிலை டிமென்ஷியா. முகவரி: எண்: 39, 3வது தெரு பிருந்தாவனம் நகர், ஆவடி, சென்னை-65."
+    },
+    "nikil": {
+        "en": "His name is nikil. He is your son. He is 45 years old. the gender is male",
+        "ta": "அவன் பெயர் நிகில். அவன் உன் மகன். அவனுக்கு 45 வயது. பாலினம் ஆண்."
+    },
+    "sekar": {
+        "en": "His name is sekar. He is your brother. He is 64 years old. the gender is male",
+        "ta": "அவர் பெயர் சேகர். அவர் உங்கள் சகோதரர். அவருக்கு 64 வயது. பாலினம் ஆண்."
+    },
+    "kayathiri": {
+        "en": "her name is kayathiri. she is your sister. she is 65 years old. the gender is female",
+        "ta": "அவள் பெயர் காயத்திரி. அவள் உன் சகோதரி. அவளுக்கு 65 வயது. பாலினம் பெண்."
+    },
+    "reta": {
+        "en": "her name is reta. she is your daughter in law. she is 43 years old. the gender is female",
+        "ta": "அவள் பெயர் ரீட்டா. அவள் உங்கள் மருமகள். அவளுக்கு 43 வயது. பாலினம் பெண்."
+    },
+    "soniya": {
+        "en": "her name is soniya. she is your girl grandchild. she is 20 years old. the gender is female",
+        "ta": "அவள் பெயர் சோனியா. அவள் உங்கள் பெண் பேத்தி. அவளுக்கு 20 வயது. பாலினம் பெண்."
+    },
+    "peter": {
+        "en": "his name is peter. he is your nephew. he is 47 years old. the gender is male",
+        "ta": "அவன் பெயர் பீட்டர். அவன் உன் மருமகன். அவனுக்கு 47 வயசு. பாலினம் ஆண்."
+    },
+    "dhoni": {
+        "en": "This is Dhoni. He is the best cricket player.",
+        "ta": "இவர் தோனி. இவர் சிறந்த கிரிக்கெட் வீரர்"
     }
 }

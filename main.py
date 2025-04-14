@@ -11,11 +11,11 @@ import face_recognition
 from gtts import gTTS
 
 
-# Constants
-FACE_DIR = "faces"
-DESC_FILE = "descriptions.json"  # JSON file to store descriptions
 
-# Load descriptions from JSON
+FACE_DIR = "faces"
+DESC_FILE = "descriptions.json"  
+
+
 def load_descriptions():
     if not os.path.exists(DESC_FILE):
         return {}
@@ -25,21 +25,21 @@ def load_descriptions():
     except json.JSONDecodeError:
         return {}
 
-# Save descriptions to JSON
+
 def save_descriptions(descriptions):
     with open(DESC_FILE, "w", encoding="utf-8") as file:
         json.dump(descriptions, file, indent=4, ensure_ascii=False)
 
-# Initialize session state for descriptions
+
 if "face_intros" not in st.session_state:
     st.session_state["face_intros"] = load_descriptions()
 
-# Track last spoken times and last printed times
+
 last_spoken_time = {}
 last_print_time = {}
 face_detection_times = {}
 
-# Load known face encodings and names
+
 def load_faces():
     known_face_encodings = []
     known_face_names = []
@@ -53,10 +53,10 @@ def load_faces():
                 known_face_names.append(os.path.splitext(file)[0].lower())
     return known_face_encodings, known_face_names
 
-# Load faces at startup
+
 known_face_encodings, known_face_names = load_faces()
 
-# Function to speak introduction
+
 def speak_intro(name, language):
     global last_spoken_time
     current_time = time.time()
@@ -84,7 +84,7 @@ def speak_intro(name, language):
 
         threading.Thread(target=speak, args=(face_intros, name, language), daemon=True).start()
 
-# Function to recognize faces
+
 def recognize_faces(language):
     video_capture = cv2.VideoCapture(0)
     process_this_frame = True

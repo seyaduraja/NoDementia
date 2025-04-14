@@ -7,7 +7,7 @@ PASSWORD = "1234"
 
 st.set_page_config(page_title="NoDementia", page_icon="🧠")
 
-# Header
+
 def header():
     st.markdown("""
         <style>
@@ -38,7 +38,7 @@ def header():
         </div>
     """, unsafe_allow_html=True)
 
-# Login screen
+
 def login():
     header()
     st.subheader("🔐 Login")
@@ -60,7 +60,7 @@ def login():
         else:
             st.error("❌ Invalid username or password")
 
-# Main dashboard
+
 def main():
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
@@ -68,7 +68,7 @@ def main():
     if st.session_state["logged_in"]:
         header()
 
-        # --- Sidebar Layout ---
+        
         st.sidebar.markdown("""
             <style>
                 .sidebar-section {
@@ -90,13 +90,18 @@ def main():
             </style>
             <div class="sidebar-section">
                 <h4>🧑 Patient Info</h4>
-                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Name:</strong> John</p>
                 <p><strong>Age:</strong> 68</p>
+                <p><strong>Gender:</strong> male</p>
+                <p><strong>patient ph number:</strong> 8938465903</p>
+                <p><strong>Emergency number of son:</strong> 9633465661</p>
                 <p><strong>Diagnosis:</strong> Early-stage Dementia</p>
+                <p><strong>Address:</strong> no:39, 3rd street brindhavana nagar,avadi, chennai-65</p>
+                       
             </div>
         """, unsafe_allow_html=True)
 
-        # --- Navigation ---
+        
         st.sidebar.title("📁 Navigation")
         choice = st.sidebar.selectbox("Go to", ["Face Recognition", "Face Management"])
 

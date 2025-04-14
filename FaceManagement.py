@@ -38,7 +38,7 @@ def show_face_management():
 
     st.markdown("<h2 style='color: #333;'>🧑‍💻 Face Profile Management</h2>", unsafe_allow_html=True)
 
-    # Section: Existing Faces
+    
     st.markdown("<div class='section'>", unsafe_allow_html=True)
     st.markdown("<h4>📁 Identity References</h4>", unsafe_allow_html=True)
     
@@ -52,7 +52,7 @@ def show_face_management():
         st.info("No faces found in the directory.")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Section: Add New Face
+    
     st.markdown("<div class='section'>", unsafe_allow_html=True)
     st.markdown("<h4>📤 Add New Face</h4>", unsafe_allow_html=True)
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
@@ -64,7 +64,7 @@ def show_face_management():
         known_face_encodings, known_face_names = load_faces()
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Section: Add Description
+    
     st.markdown("<div class='section'>", unsafe_allow_html=True)
     st.markdown("<h4>📝 Add Face Description</h4>", unsafe_allow_html=True)
     

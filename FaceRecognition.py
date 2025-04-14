@@ -3,7 +3,7 @@ from main import recognize_faces
 
 
 def show_face_recognition():
-    # Style
+    
     st.markdown("""
         <style>
             .section {
@@ -41,7 +41,7 @@ def show_face_recognition():
         </style>
     """, unsafe_allow_html=True)
 
-    # Sidebar language selection
+    
     st.sidebar.markdown("### 🌐 Language Preference for Speech")
     with st.sidebar:
         st.markdown('<div class="custom-radio">', unsafe_allow_html=True)
@@ -50,7 +50,7 @@ def show_face_recognition():
 
     lang_code = "en" if language == "English" else "ta"
 
-    # Main section
+    
     st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown("<h2>📸 Face Recognition</h2>", unsafe_allow_html=True)
 
